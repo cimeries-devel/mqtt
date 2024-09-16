@@ -13,4 +13,6 @@ class Admin:
 
     def send(self, data: dict):
         self.document = self.db.collection(data['date']).document(data['time'])
+        self.pi = self.db.collection('pi').document('lse01')
         self.document.set(data)
+        self.pi.set(data)
