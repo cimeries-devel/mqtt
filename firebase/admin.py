@@ -1,11 +1,13 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from os.path import join
 
 
 class Admin:
-    def __init__(self, config):
-        self.cred = credentials.Certificate(config.get('key'))
+    def __init__(self, config, root):
+        file_key = join(root, config.get('key'))
+        self.cred = credentials.Certificate(file_key)
         app = firebase_admin.initialize_app(self.cred)
         self.db = firestore.client(app)
 
