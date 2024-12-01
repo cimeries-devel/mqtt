@@ -11,7 +11,7 @@ class Pi:
     def __init__(self, config, root):
         self.config = config
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(config.get('pin'), GPIO.OUT)
+        GPIO.setup(int(config.get('pin')), GPIO.OUT)
         file_key = join(root, config.get('key'))
         self.cred = credentials.Certificate(file_key)
         app = firebase_admin.initialize_app(self.cred)
@@ -21,8 +21,8 @@ class Pi:
     def on_snapshot(self, doc_snapshot, changes, read_time):
         for doc in doc_snapshot:
             batery, date, time, sc, st, sm = doc.to_dict().values()
-            GPIO.output(self.config('key'),
-                        GPIO.HIGH if sm > 1.5 else GPIO.LOW)
+            GPIO.output(int(self.config.get('pin')),
+                        GPIO.HIGH if float(sm) > 1.5 else GPIO.LOW)
 
         self.callback_done.set()
 
