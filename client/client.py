@@ -36,9 +36,9 @@ class Client:
     def __serialize(self, data: dict):
         now = datetime.now()
         serialize = {'batery': data.get('Bat'),
-                     'soil_conductivity': data.get('conduct_SOIL'),
-                     'soil_temperature': data.get('temp_SOIL'),
-                     'soil_moisture': data.get('water_SOIL'),
+                     'soil_conductivity': float(data.get('conduct_SOIL')),
+                     'soil_temperature': float(data.get('temp_SOIL')),
+                     'soil_moisture': float(data.get('water_SOIL')),
                      'date': now.strftime('%Y-%m-%d'),
                      'time': now.strftime('%H:%M:%S')}
 
