@@ -1,6 +1,7 @@
 import threading
 import firebase_admin
 import time
+# import RPi.GPIO as GPIO
 from firebase_admin import credentials
 from firebase_admin import firestore
 from os.path import join
@@ -8,6 +9,9 @@ from os.path import join
 
 class Pi:
     def __init__(self, config, root):
+        self.config = config
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setup(config.get('pin'), GPIO.OUT)
         file_key = join(root, config.get('key'))
         self.cred = credentials.Certificate(file_key)
         app = firebase_admin.initialize_app(self.cred)
@@ -16,6 +20,9 @@ class Pi:
 
     def on_snapshot(self, doc_snapshot, changes, read_time):
         for doc in doc_snapshot:
+            # GPIO.output(self.config('key'), GPIO.HIGH)
+            batery, date, time, sc, st, sm = doc.to_dict().values()
+
             print(doc.to_dict())
         self.callback_done.set()
 
@@ -35,5 +42,3 @@ class Pi:
             print(data.to_dict())
         else:
             print('not data')
-
-
