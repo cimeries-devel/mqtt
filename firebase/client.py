@@ -10,6 +10,7 @@ from os.path import join
 class Pi:
     def __init__(self, config, root):
         self.config = config
+        GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(int(config.get('pin')), GPIO.OUT)
         file_key = join(root, config.get('key'))
@@ -20,9 +21,9 @@ class Pi:
 
     def on_snapshot(self, doc_snapshot, changes, read_time):
         for doc in doc_snapshot:
-            batery, date, time, sc, st, sm = doc.to_dict().values()
+            soil_moisture = doc.to_dict().get('soil_moisture')
             GPIO.output(int(self.config.get('pin')),
-                        GPIO.HIGH if float(sm) > 1.5 else GPIO.LOW)
+                        GPIO.HIGH if soil_moisture > 1.5 else GPIO.LOW)
 
         self.callback_done.set()
 
