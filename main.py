@@ -18,9 +18,9 @@ if __name__ == '__main__':
 
     while True:
         try:
-            client.connect()
-            if client.is_valid_data():
-                break
-            admin.send(client.get_data())
+            status = client.connect()
+            data = client.get_data()
+            if status and data:
+                admin.send(data)
         except KeyboardInterrupt:
             break

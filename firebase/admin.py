@@ -10,9 +10,15 @@ class Admin:
         self.cred = credentials.Certificate(file_key)
         app = firebase_admin.initialize_app(self.cred)
         self.db = firestore.client(app)
+        self.lse = self.db.collection('pi').document('lse01')
 
     def send(self, data: dict):
         self.document = self.db.collection(data['date']).document(data['time'])
-        self.pi = self.db.collection('pi').document('lse01')
         self.document.set(data)
-        self.pi.set(data)
+        self.lse.set(data)
+
+    def get(self):
+        data = self.lse.get()
+        if data.exists:
+            return data.to_dict().get('fixed_moisture')
+        return 30

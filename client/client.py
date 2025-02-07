@@ -9,7 +9,6 @@ class Client:
         self.config = config
 
     def connect(self):
-        m = (None, None)
         try:
             m = subscribe.simple(
                 client_id='cimeries',
@@ -20,14 +19,19 @@ class Client:
                       'password': self.config.get('pass')},
                 msg_count=2)
         except MQTTException:
-            pass
-        finally:
-            self.payload = m[1]
+            return False
+        self.payload = m[1]
+        return True
 
     def get_data(self):
-        data = json.loads(str(self.payload.payload, 'utf-8'))
-        message = data['uplink_message']
-        d = message['decoded_payload']
+        data = json.loads(self.payload.payload.decode())
+        message = data.get('uplink_message')
+        if not message:
+            message = data.get('uplink_normalized')
+        d = message['normalized_payload']
+
+        if not isinstance(d, dict):
+            d = d[0]
         return self.__serialize(d)
 
     def is_valid_data(self):
@@ -35,11 +39,14 @@ class Client:
 
     def __serialize(self, data: dict):
         now = datetime.now()
-        serialize = {'batery': data.get('Bat'),
-                     'soil_conductivity': float(data.get('conduct_SOIL')),
-                     'soil_temperature': float(data.get('temp_SOIL')),
-                     'soil_moisture': float(data.get('water_SOIL')),
-                     'date': now.strftime('%Y-%m-%d'),
-                     'time': now.strftime('%H:%M:%S')}
+        ec = data.get('soil').get('ec')
+        serialize = {
+            'batery': data.get('battery'),
+            'fixed_moisture': float(self.config.get('temperature')),
+            'soil_conductivity': float(ec) if ec else 0,
+            'soil_temperature': float(data.get('soil').get('temperature')),
+            'soil_moisture': float(data.get('soil').get('moisture')),
+            'date': now.strftime('%Y-%m-%d'),
+            'time': now.strftime('%H:%M:%S')}
 
         return serialize
