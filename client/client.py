@@ -41,7 +41,7 @@ class Client:
         now = datetime.now()
         ec = data.get('soil').get('ec')
         serialize = {
-            'batery': data.get('battery'),
+            'battery': data.get('battery'),
             'fixed_moisture': float(self.config.get('temperature')),
             'soil_conductivity': float(ec) if ec else 0,
             'soil_temperature': float(data.get('soil').get('temperature')),
