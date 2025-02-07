@@ -1,7 +1,7 @@
 import threading
 import firebase_admin
 import time
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 from firebase_admin import credentials
 from firebase_admin import firestore
 from os.path import join
@@ -10,9 +10,9 @@ from os.path import join
 class Pi:
     def __init__(self, config, root):
         self.config = config
-        GPIO.setwarnings(False)
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(int(config.get('pin')), GPIO.OUT)
+        # GPIO.setwarnings(False)
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setup(int(config.get('pin')), GPIO.OUT)
 
         file_key = join(root, config.get('key'))
         self.cred = credentials.Certificate(file_key)
@@ -25,19 +25,21 @@ class Pi:
         for doc in doc_snapshot:
             data = doc.to_dict()
             sm = data.get('soil_moisture')
-            fm = data.get('fixed_moisture')
-            self.config['temperature'] = fm
+            fm_min = data.get('fixed_moisture_min')
+            fm_max = data.get('fixed_moisture_max')
+            self.config['temperature_min'] = fm_min
+            self.config['temperature_max'] = fm_max
             self._save_env()
 
-            GPIO.output(int(self.config.get('pin')),
-                        GPIO.HIGH if sm < fm else GPIO.LOW)
+            # GPIO.output(int(self.config.get('pin')),
+            #             GPIO.HIGH if sm < fm else GPIO.LOW)
 
         self.callback_done.set()
 
     def get(self):
         data = self.lse.get()
         if data.exists:
-            return data.to_dict().get('fixed_moisture')
+            return data.to_dict()
         return None
 
     def watch(self):

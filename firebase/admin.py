@@ -20,5 +20,5 @@ class Admin:
     def get(self):
         data = self.lse.get()
         if data.exists:
-            return data.to_dict().get('fixed_moisture')
+            return data.to_dict()
         return 30
