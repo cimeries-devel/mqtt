@@ -40,12 +40,14 @@ class Client:
     def __serialize(self, data: dict):
         now = datetime.now()
         ec = data.get('soil').get('ec')
+        temp = data.get('soil').get('temperature')
+        mois = data.get('soil').get('moisture')
         serialize = {
             'battery': data.get('battery'),
             'fixed_moisture': float(self.config.get('temperature')),
             'soil_conductivity': float(ec) if ec else 0,
-            'soil_temperature': float(data.get('soil').get('temperature')),
-            'soil_moisture': float(data.get('soil').get('moisture')),
+            'soil_temperature': float(temp) if temp else 0,
+            'soil_moisture': float(mois) if mois else 0,
             'date': now.strftime('%Y-%m-%d'),
             'time': now.strftime('%H:%M:%S')}
 
