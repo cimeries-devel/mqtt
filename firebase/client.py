@@ -26,6 +26,7 @@ class Pi:
             data = doc.to_dict()
             sm = data.get('soil_moisture')
             fm_min = data.get('fixed_moisture_min')
+            print(fm_min)
             # fm_max = data.get('fixed_moisture_max')
 
             GPIO.output(int(self.config.get('pin')),
