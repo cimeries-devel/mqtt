@@ -1,7 +1,7 @@
 import threading
 import firebase_admin
 import time
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 from firebase_admin import credentials
 from firebase_admin import firestore
 from os.path import join
@@ -10,9 +10,9 @@ from os.path import join
 class Pi:
     def __init__(self, config, root):
         self.config = config
-        # GPIO.setwarnings(False)
-        # GPIO.setmode(GPIO.BCM)
-        # GPIO.setup(int(config.get('pin')), GPIO.OUT)
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(int(config.get('pin')), GPIO.OUT)
 
         file_key = join(root, config.get('key'))
         self.cred = credentials.Certificate(file_key)
@@ -26,13 +26,10 @@ class Pi:
             data = doc.to_dict()
             sm = data.get('soil_moisture')
             fm_min = data.get('fixed_moisture_min')
-            fm_max = data.get('fixed_moisture_max')
-            self.config['temperature_min'] = fm_min
-            self.config['temperature_max'] = fm_max
-            self._save_env()
+            # fm_max = data.get('fixed_moisture_max')
 
-            # GPIO.output(int(self.config.get('pin')),
-            #             GPIO.HIGH if sm < fm else GPIO.LOW)
+            GPIO.output(int(self.config.get('pin')),
+                        GPIO.HIGH if sm < fm_min else GPIO.LOW)
 
         self.callback_done.set()
 
@@ -49,9 +46,4 @@ class Pi:
                 time.sleep(1)
             except KeyboardInterrupt:
                 break
-
-    def _save_env(self):
-        with open('.env', 'w') as f:
-            for key, value in self.config.items():
-                f.write(f'{key}={value}\n')
 

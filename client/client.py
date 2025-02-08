@@ -44,8 +44,6 @@ class Client:
         mois = data.get('soil').get('moisture')
         serialize = {
             'battery': data.get('battery'),
-            'fixed_moisture_min': float(self.config.get('temperature_min')),
-            'fixed_moisture_max': float(self.config.get('temperature_max')),
             'soil_conductivity': float(ec) if ec else 0,
             'soil_temperature': float(temp) if temp else 0,
             'soil_moisture': float(mois) if mois else 0,
