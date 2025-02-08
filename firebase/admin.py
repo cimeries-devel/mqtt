@@ -7,6 +7,7 @@ from os.path import join
 class Admin:
     def __init__(self, config, root):
         self.config = config
+        self.root = root
         file_key = join(root, config.get('key'))
         self.cred = credentials.Certificate(file_key)
         app = firebase_admin.initialize_app(self.cred)
@@ -39,6 +40,6 @@ class Admin:
             self.config.get('temperature_max')
 
     def _save_env(self):
-        with open('.env', 'w') as f:
+        with open('{}/.env'.format(self.root), 'w') as f:
             for key, value in self.config.items():
                 f.write(f'{key}={value}\n')
