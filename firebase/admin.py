@@ -17,27 +17,40 @@ class Admin:
     def send(self, data: dict):
         self.document = self.db.collection(data['date']).document(data['time'])
 
-        temp_min, temp_max = self.get()
+        temp_min, temp_max, average, status = self.get(data)
 
         data['fixed_moisture_min'] = temp_min
         data['fixed_moisture_max'] = temp_max
+        data['average'] = average
+        data['status'] = status
 
         self.document.set(data)
         self.lse.set(data)
 
-    def get(self):
-        data = self.lse.get()
-        if data.exists:
-            data = data.to_dict()
-            self.config['temperature_min'] = data.get('fixed_moisture_min')
-            self.config['temperature_max'] = data.get('fixed_moisture_max')
+    def get(self, data: dict):
+        ds = self.lse.get()
+        if ds.exists:
+            ds = ds.to_dict()
+            self.config['temperature_min'] = ds.get('fixed_moisture_min')
+            self.config['temperature_max'] = ds.get('fixed_moisture_max')
             self._save_env()
 
-            return data.get('fixed_moisture_min'), \
-                data.get('fixed_moisture_max')
+            collection = self.db.collection(data.get('date'))
+            docs = collection.get()
+            sum = 0
+            for doc in docs:
+                sum += doc.to_dict().get('soil_moisture')
+
+            average = round(sum/len(docs), 2)
+            status = data.get('soil_moisture') < ds.get('fixed_moisture_min')
+
+            return ds.get('fixed_moisture_min'), \
+                ds.get('fixed_moisture_max'), \
+                average, status
 
         return self.config.get('temperature_min'), \
-            self.config.get('temperature_max')
+            self.config.get('temperature_max'), \
+            0, False
 
     def _save_env(self):
         with open('{}/.env'.format(self.root), 'w') as f:

@@ -24,12 +24,9 @@ class Pi:
     def on_snapshot(self, doc_snapshot, changes, read_time):
         for doc in doc_snapshot:
             data = doc.to_dict()
-            sm = data.get('soil_moisture')
-            fm_min = data.get('fixed_moisture_min')
-            # fm_max = data.get('fixed_moisture_max')
-
+            status = data.get('status')
             GPIO.output(int(self.config.get('pin')),
-                        GPIO.HIGH if sm < fm_min else GPIO.LOW)
+                        GPIO.HIGH if status else GPIO.LOW)
 
         self.callback_done.set()
 
