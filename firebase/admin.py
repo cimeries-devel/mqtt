@@ -23,7 +23,6 @@ class Admin:
         data['fixed_moisture_max'] = temp_max
         data['average'] = average
         data['status'] = status
-
         self.document.set(data)
         self.lse.set(data)
 
@@ -41,7 +40,7 @@ class Admin:
             for doc in docs:
                 sum += doc.to_dict().get('soil_moisture')
 
-            average = round(sum/len(docs), 2)
+            average = round(sum/len(docs), 2) if len(docs) != 0 else 0
             status = data.get('soil_moisture') < ds.get('fixed_moisture_min')
 
             return ds.get('fixed_moisture_min'), \
